@@ -37,18 +37,17 @@ jobs:
   kcs-scan:
     needs: build-and-push
     runs-on: self-hosted
-    container:
-      image: repo.kcs.kaspersky.com/images/scanner:v2.0.0-with-db
-      credentials:
-        username: ${{ secrets.KCS_REPO_USER }}
-        password: ${{ secrets.KCS_REPO_PASS }}
 
     steps:
+      - name: Pull KCS scanner
+        run: docker pull repo.kcs.kaspersky.com/images/scanner:v2.0.0-with-db
+
       - name: Scan image with KCS
-        env:
-          SCAN_TARGET: ghcr.io/borasevin/kcs-ghcr-demo:demo
-          API_TOKEN: ${{ secrets.KCS_API_TOKEN }}
-          API_BASE_URL: http://kcs.local
-          COMPANY_EXT_REGISTRY_USERNAME: borasevin
-          COMPANY_EXT_REGISTRY_PASSWORD: ${{ secrets.GHCR_PAT }}
-        run: /bin/sh /entrypoint.sh $SCAN_TARGET --stdout > kcs-scan-result.json
+        run: |
+          docker run --rm \
+            -e API_TOKEN='${{ secrets.KCS_API_TOKEN }}' \
+            -e API_BASE_URL='http://kcs.local' \
+            -e COMPANY_EXT_REGISTRY_USERNAME='borasevin' \
+            -e COMPANY_EXT_REGISTRY_PASSWORD='${{ secrets.GHCR_PAT }}' \
+            repo.kcs.kaspersky.com/images/scanner:v2.0.0-with-db \
+            /bin/sh /entrypoint.sh ghcr.io/borasevin/kcs-ghcr-demo:demo --stdout
