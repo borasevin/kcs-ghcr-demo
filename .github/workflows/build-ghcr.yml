@@ -28,11 +28,11 @@ jobs:
     steps:
       - name: Scan image with KCS
         run: |
-          docker run --rm \
-            repo.kcs.kaspersky.com/images/scanner:v2.3.0-with-db \
-            --stdout \
-            --api-base-url http://10.10.231.230 \
-            --api-token '${{ secrets.KCS_API_TOKEN }}' \
-            --company-ext-registry-username bora \
-            --company-ext-registry-password demo123 \
-            10.10.231.230:5000/kcs-ghcr-demo:demo
+         docker run --rm \
+          -e API_TOKEN='${{ secrets.KCS_API_TOKEN }}' \
+          -e COMPANY_EXT_REGISTRY_USERNAME='bora' \
+          -e COMPANY_EXT_REGISTRY_PASSWORD='demo123' \
+          repo.kcs.kaspersky.com/images/scanner:v2.3.0-with-db \
+          --stdout \
+          --api-base-url http://10.10.231.230 \
+          10.10.231.230:5000/kcs-ghcr-demo:demo
