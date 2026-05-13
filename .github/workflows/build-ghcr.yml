@@ -32,11 +32,12 @@ jobs:
       - name: Scan image with KCS
         run: |
          docker run --rm \
+          --add-host kcs.local:10.10.231.200 \
           -e API_TOKEN='${{ secrets.KCS_API_TOKEN }}' \
           -e COMPANY_EXT_REGISTRY_USERNAME='bora' \
           -e COMPANY_EXT_REGISTRY_PASSWORD='demo123' \
           -e SKIP_API_SERVER_VALIDATION='true' \
           repo.kcs.kaspersky.com/images/scanner:v2.3.0-with-db \
           10.10.231.230:5000/kcs-ghcr-demo:demo \
-          --api-base-url http://10.10.231.200 \
+          --api-base-url http://kcs.local \
           --stdout
