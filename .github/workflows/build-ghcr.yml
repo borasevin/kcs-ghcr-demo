@@ -15,5 +15,23 @@ jobs:
       - name: Build image
         run: docker build -t 10.10.231.230:5000/kcs-ghcr-demo:demo .
 
+      - name: Login to Local Registry
+        run: echo 'demo123' | docker login 10.10.231.230:5000 -u bora --password-stdin
+
       - name: Push image
         run: docker push 10.10.231.230:5000/kcs-ghcr-demo:demo
+
+  kcs-scan:
+    needs: build-and-push
+    runs-on: self-hosted
+
+    steps:
+      - name: Scan image with KCS
+        run: |
+          docker run --rm \
+            -e API_TOKEN='${{ secrets.KCS_API_TOKEN }}' \
+            -e API_BASE_URL='http://10.10.231.230' \
+            -e COMPANY_EXT_REGISTRY_USERNAME='bora' \
+            -e COMPANY_EXT_REGISTRY_PASSWORD='demo123' \
+            repo.kcs.kaspersky.com/images/scanner:v2.3.0-with-db \
+            /bin/sh /entrypoint.sh 10.10.231.230:5000/kcs-ghcr-demo:demo --stdout
