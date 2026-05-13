@@ -31,3 +31,22 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository }}:demo
+
+  kcs-scan:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    container:
+      image: repo.kcs.kaspersky.com/images/scanner:v2.0.0-with-db
+      credentials:
+        username: ${{ secrets.KCS_REPO_USER }}
+        password: ${{ secrets.KCS_REPO_PASS }}
+
+    steps:
+      - name: Scan image with KCS
+        env:
+          SCAN_TARGET: ghcr.io/borasevin/kcs-ghcr-demo:demo
+          API_TOKEN: ${{ secrets.KCS_API_TOKEN }}
+          API_BASE_URL: http://kcs.local
+          COMPANY_EXT_REGISTRY_USERNAME: borasevin
+          COMPANY_EXT_REGISTRY_PASSWORD: ${{ secrets.GHCR_PAT }}
+        run: /bin/sh /entrypoint.sh $SCAN_TARGET --stdout > kcs-scan-result.json
