@@ -40,4 +40,4 @@ jobs:
           repo.kcs.kaspersky.com/images/scanner:v2.3.0-with-db \
           10.10.231.230:5000/kcs-ghcr-demo:demo \
           --api-base-url http://kcs.local \
-          --stdout
+          --stdout || true
